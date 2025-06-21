@@ -1,27 +1,32 @@
-from kafka import KafkaProducer
+# kafka_producer.py
+
 import json
 import time
-from faker import Faker
-import uuid
 import random
+from kafka import KafkaProducer
+from datetime import datetime
 
-fake = Faker()
+KAFKA_TOPIC = "banking-transactions"
+KAFKA_SERVER = "localhost:9092"
+
 producer = KafkaProducer(
-    bootstrap_servers='localhost:9092',
-    value_serializer=lambda v: json.dumps(v).encode('utf-8')
+    bootstrap_servers=KAFKA_SERVER,
+    value_serializer=lambda v: json.dumps(v).encode("utf-8")
 )
 
-while True:
-    transaction = {
-        'transaction_id': str(uuid.uuid4()),
-        'timestamp': fake.date_time_this_century().isoformat(),
-        'amount': round(random.uniform(10.0, 1000.0), 2),
-        'sender_account': fake.iban(),
-        'receiver_account': fake.iban(),
-        'location': fake.city(),
-        'is_fraud': random.choice([0, 1])
+def generate_transaction():
+    return {
+        "account_id": random.randint(1000, 9999),
+        "transaction_type": random.choice(["deposit", "withdrawal", "transfer"]),
+        "amount": round(random.uniform(10, 1000), 2),
+        "timestamp": datetime.utcnow().isoformat()
     }
-    producer.send('transactions', transaction)
-    print(f"Produced: {transaction}")
-    time.sleep(1)
+
+print("🚀 Kafka Producer Started... Sending transactions...")
+
+while True:
+    txn = generate_transaction()
+    producer.send(KAFKA_TOPIC, txn)
+    print("Produced:", txn)
+    time.sleep(2)  # Adjust as needed
 

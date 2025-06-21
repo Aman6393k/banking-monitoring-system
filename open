@@ -1,0 +1,10 @@
+from sqlalchemy import create_engine
+
+# PostgreSQL connection URL format:
+# "postgresql://<username>:<password>@<host>:<port>/<database>"
+DATABASE_URL = "postgresql://postgres:your_password@localhost:5432/banking"
+
+# Create SQLAlchemy engine
+engine = create_engine(DATABASE_URL)
+
+
